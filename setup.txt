@@ -1,0 +1,5 @@
+Hello elixir learners. I had some inspiration today for how to run our sessions starting next week. We will pair up and work on the problems. We’ll try to have one remote person work with one person who is in the office. We will screen-share via TMate (TMUX over ssh) and we will solve the problems together using vim. So, if these technologies are unfamiliar to you, then you’ve got some homework: 
+
+1) Learn how to create, open/close, edit, and save files using vim in a terminal window. (https://vim.rtorr.com)
+2a) Learn how to start, detach, attach, and exit a TMUX session. (https://tmuxcheatsheet.com)
+2b) Install tmate and learn how to start a tmate session: (https://tmate.io)
