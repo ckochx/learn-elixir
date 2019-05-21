@@ -43,20 +43,68 @@ defmodule NQueens do
   defp eval(_list, _n, acc \\ [])
   defp eval([], n, acc), do: eval_placements(acc)
   defp eval([el], n, acc), do: eval_placements(acc)
-  defp eval([head|tail], n, acc) do
-    acc = acc ++ Enum.map(tail, fn(row) ->
-      valid_placement?(head, row)
-    end)
-    eval(tail, n, acc)
+  defp eval([current_queen_coords|remaining_queen_coords], n, acc) do
+    acc = acc ++ [valid_diagonals?(current_queen_coords, remaining_queen_coords, n)]
+    # |> IO.inspect
+    eval(remaining_queen_coords, n, acc)
   end
 
   # [{2, 0}, {4, 1}, {0, 2}, {3, 3}, {1, 4}]
-  defp valid_placement?({a_val, b_idx} = h, {_c_val, _d_idx} = tv) do
-    if tv == {a_val + 1, b_idx + 1} || tv == {a_val - 1, b_idx + 1} do
-      false
-    else
-      true
-    end
+  # defp valid_placement?({a_val, b_idx} = h, {_c_val, _d_idx} = tv) do
+  #   if tv == {a_val + 1, b_idx + 1} || tv == {a_val - 1, b_idx + 1} do
+  #     false
+  #   else
+  #     true
+  #   end
+  # end
+
+  defp valid_diagonals?({x, y} = current_queen_coords, remaining_queen_coords, n) do
+    IO.puts "N #{n}"
+    # IO.puts "current_queen_coords"
+    current_queen_coords
+    # |> IO.inspect
+    # IO.puts "Left Diagonal"
+    left_diagonal = diagonal_left({ x - 1, y + 1 }, n, [])
+    # |> IO.inspect
+    # IO.puts "Right Diagonal"
+    right_diagonal = diagonal_right({ x + 1, y + 1 }, n, [])
+    # |> IO.inspect
+
+    # IO.puts "Remaining Queens"
+    remaining_queens_map_set = remaining_queen_coords
+    |> MapSet.new()
+    # |> IO.inspect
+    # IO.puts "Diagonals"
+    diagonals_map_set = left_diagonal ++ right_diagonal
+    |> MapSet.new()
+    # |> IO.inspect
+
+
+    intersection_size = MapSet.intersection(diagonals_map_set, remaining_queens_map_set)
+    |> MapSet.size()
+    |> IO.inspect
+
+    intersection_size <= 0
+  end
+
+  defp diagonal_right({x,y}, n, acc) when x == n - 1 do
+    acc ++ [{x, y}]
+  end
+  defp diagonal_right({x,y}, n, acc) when y == n - 1 do
+    acc ++ [{x, y}]
+  end
+  defp diagonal_right({x,y}, n, acc) do
+    diagonal_right({x+1,y+1}, n, acc ++ [{x, y}])
+  end
+
+  defp diagonal_left({x,y}, n, acc) when x == 0 do
+    acc ++ [{x, y}]
+  end
+  defp diagonal_left({x,y}, n, acc) when y == n - 1 do
+    acc ++ [{x, y}]
+  end
+  defp diagonal_left({x,y}, n, acc) do
+    diagonal_left({x-1,y+1}, n, acc ++ [{x, y}])
   end
 
   defp eval_placements(acc) do

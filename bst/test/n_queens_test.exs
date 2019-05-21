@@ -139,9 +139,8 @@ defmodule NQueensTest do
       end
     end
 
-    # @tag :skip
     property "each diagonal zero or one 'Q'" do
-      check all int <- integer(4..99) do
+      check all int <- integer(4..10) do
         IO.inspect int
         IO.puts "solution"
         solution = NQueens.solve(int)
@@ -163,29 +162,24 @@ defmodule NQueensTest do
     end
 
     test "diagonal_right" do
-      IO.inspect diagonals(4)
-      # assert diagonal_right({0,0}, 4, []) == []
+      all_diagonals = [
+        [{0, 0}, {1, 1}, {2, 2}, {3, 3}],
+        [{3, 0}, {2, 1}, {1, 2}, {0, 3}],
+        [{1, 0}, {2, 1}, {3, 2}],
+        [{0, 1}, {1, 2}, {2, 3}],
+        [{2, 0}, {1, 1}, {0, 2}],
+        [{3, 1}, {2, 2}, {1, 3}],
+        [{2, 0}, {3, 1}],
+        [{0, 2}, {1, 3}],
+        [{1, 0}, {0, 1}],
+        [{3, 2}, {2, 3}],
+        [{3, 0}],
+        [{0, 3}],
+        [{0, 0}],
+        [{3, 3}]
+      ]
+      assert diagonals(4) == all_diagonals
     end
-
-
-
-    # def diagonals(n) do
-    #   Enum.flat_map(0..n-1, fn(i) ->
-    #     IO.puts "acc0"
-    #     acc0 = diagonal_right({i,0}, n, [])
-    #     |> IO.inspect
-    #     # acc1 = diagonal_right({n-1,i}, n, [])
-    #     # |> IO.inspect
-    #     IO.puts "acc2"
-    #     acc2 = diagonal_left({n-1-i,0}, n, [])
-    #     |> IO.inspect
-    #     # [acc0, acc1, acc2]
-    #     # |> IO.inspect
-    #     # IO.puts "VVV acc ++ acc2 VVV"
-    #     # IO.inspect(acc ++ acc2)
-    #   end)
-    # end
-
 
     # given square matrix of size n
     # output == [[{1,1},..{n,n}],[{2,1}..{n,n-1}]..[{n,n}]]
@@ -232,6 +226,5 @@ defmodule NQueensTest do
     def diagonal_left({x,y}, n, acc) do
       diagonal_left({x-1,y+1}, n, acc ++ [{x, y}])
     end
-
   end
 end
