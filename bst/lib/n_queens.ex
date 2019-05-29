@@ -10,15 +10,41 @@ defmodule NQueens do
   def solve(2), do: [] #{:invalid, []}
   def solve(3), do: [] #{:invalid, []}
   def solve(n) when n < 1, do: [] #{:invalid, []}
+  # def solve(n) do
+  #   proposed = Enum.shuffle(0..n - 1) |> Enum.with_index
+  #   valid_solution?(proposed, n)
+  # end
   def solve(n) do
-    proposed = Enum.shuffle(0..n - 1) |> Enum.with_index
-    valid_solution?(proposed, n)
+    # list = Enum.to_list(0..n-1)
+    # solutions = Permutations.perms(list)
+    # solutions
+    # |> Enum.count()
+    # |> IO.inspect
+
+    Enum.to_list(0..n-1)
+    |> Permutations.perms()
+    |> Enum.reduce([], fn(x, acc) ->
+      x_indexed = x |> Enum.with_index
+      if trivally_valid?(x_indexed) do
+        if eval(x_indexed, n) do
+          acc ++ [x_indexed]
+        else
+          acc
+        end
+      else
+        acc
+      end
+    end)
   end
 
+  def visualize(1), do: [["Q"]]
   def visualize(n) do
     solution = solve(n)
-    display(solution, n)
+    |> List.first
+    |> visualize(n)
   end
+  def visualize(nil, _n), do: []
+  def visualize([], _n), do: []
   def visualize(solution, n) do
     display(solution, n)
   end
@@ -32,12 +58,21 @@ defmodule NQueens do
     end)
   end
 
-  defp display(true, prop, _n), do: prop
-  defp display(_, _prop, n), do: solve(n)
+  # defp display(true, prop, _n), do: prop
+  # defp display(_, _prop, n), do: solve(n)
 
-  defp valid_solution?(prop, n) do
-    eval(prop, n)
-    |> display(prop, n)
+  # defp valid_solution?(prop, n) do
+  #   eval(prop, n)
+  #   |> display(prop, n)
+  # end
+
+  defp trivally_valid?([{h_x, h_y}|tail]) do
+    trivally_valid?({h_x, h_y}, tail, false)
+  end
+  defp trivally_valid?({_, _}, [], _), do: true
+  defp trivally_valid?(_, _, true), do: false
+  defp trivally_valid?({h_x, h_y}, [{t_x, t_y}|tail], false) do
+    trivally_valid?({t_x, t_y}, tail, h_x + 1 == t_x || h_x - 1 == t_x)
   end
 
   defp eval(_list, _n, acc \\ [])
@@ -45,7 +80,6 @@ defmodule NQueens do
   defp eval([el], n, acc), do: eval_placements(acc)
   defp eval([current_queen_coords|remaining_queen_coords], n, acc) do
     acc = acc ++ [valid_diagonals?(current_queen_coords, remaining_queen_coords, n)]
-    # |> IO.inspect
     eval(remaining_queen_coords, n, acc)
   end
 
@@ -59,30 +93,15 @@ defmodule NQueens do
   # end
 
   defp valid_diagonals?({x, y} = current_queen_coords, remaining_queen_coords, n) do
-    IO.puts "N #{n}"
-    # IO.puts "current_queen_coords"
-    current_queen_coords
-    # |> IO.inspect
-    # IO.puts "Left Diagonal"
+    # current_queen_coords
     left_diagonal = diagonal_left({ x - 1, y + 1 }, n, [])
-    # |> IO.inspect
-    # IO.puts "Right Diagonal"
     right_diagonal = diagonal_right({ x + 1, y + 1 }, n, [])
-    # |> IO.inspect
-
-    # IO.puts "Remaining Queens"
     remaining_queens_map_set = remaining_queen_coords
     |> MapSet.new()
-    # |> IO.inspect
-    # IO.puts "Diagonals"
     diagonals_map_set = left_diagonal ++ right_diagonal
     |> MapSet.new()
-    # |> IO.inspect
-
-
     intersection_size = MapSet.intersection(diagonals_map_set, remaining_queens_map_set)
     |> MapSet.size()
-    |> IO.inspect
 
     intersection_size <= 0
   end
@@ -112,4 +131,35 @@ defmodule NQueens do
       x == false
     end)
   end
+end
+
+defmodule Permutations do
+  def perms(%MapSet{} = set), do: MapSet.to_list(set) |> perms
+  def perms([]), do: [[]]
+  def perms(l) do
+    for h <- l, t <- perms(l -- [h]) do
+      [h|t]
+    end
+  end
+
+  # def non_adjacent_perms([]), do: [[]]
+  # def non_adjacent_perms(l) do
+  #   for h <- l, t <- non_adjacent_perms(l -- [h]) do
+  #     append_conditional(h, t)
+  #   end
+  # end
+
+  # defp append_conditional(h, []), do: [h]
+  # defp append_conditional(h, t) do
+  #   IO.inspect h
+
+  #   [t_0|t_t] = t
+  #   IO.inspect t_0
+  #   if h + 1 == t_0 || h - 1 == t_0 do
+  #     []
+  #   else
+  #     [h|t]
+  #   end
+
+  # end
 end
